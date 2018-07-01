@@ -1,0 +1,4 @@
+CREATE USER adminfotrris IDENTIFIED BY 'f0trr1s?';
+CREATE DATABASE fotrrisdb;
+GRANT ALL PRIVILEGES ON fotrrisdb.* TO adminfotrris;
+FLUSH PRIVILEGES;

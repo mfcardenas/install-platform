@@ -1,0 +1,46 @@
+version: '2'
+services:
+  db:
+    build: ./db
+    environment:
+      - MYSQL_ROOT_USER=${MYSQL_ROOT_USER}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./data:/var/lib/mysql
+    ports:
+      - '${MYSQL_EXPOSURE_PORT}:${MYSQL_PORT}'
+  server:
+    build: ./server
+    links:
+      - "db:mysql"
+    environment:
+      - ETHERPAD_TITLE=${ETHERPAD_TITLE}
+      - ETHERPAD_DEFAULT_PAD_TEXT=${ETHERPAD_DEFAULT_PAD_TEXT}
+      - ETHERPAD_PORT=${ETHERPAD_EXPOSURE_PORT}
+      - ETHERPAD_ADMIN_PASSWORD=${ETHERPAD_ADMIN_PASSWORD}
+      - ETHERPAD_ADMIN_USER=${ETHERPAD_ADMIN_USER}
+      - ETHERPAD_DB_HOST=${ETHERPAD_DB_HOST}
+      - ETHERPAD_DB_PORT=${ETHERPAD_DB_PORT}
+      - ETHERPAD_DB_USER=${ETHERPAD_DB_USER}
+      - ETHERPAD_DB_PASSWORD=${ETHERPAD_DB_PASSWORD}
+      - ETHERPAD_DB_NAME=${ETHERPAD_DB_NAME}
+      - ETHERPAD_API_KEY=${ETHERPAD_API_KEY}
+      - ETHERPAD_SESSION_REQUIRED=${ETHERPAD_SESSION_REQUIRED}
+#    expose:
+#      - "${ETHERPAD_EXPOSURE_PORT}"
+    ports:
+      - "${ETHERPAD_EXPOSURE_PORT}:${ETHERPAD_HOST_PORT}"
+    depends_on:
+      - db
+    volumes:
+      - ./etherpad/settings:/opt/etherpad-lite/var
+  web:
+    build: ./web
+    ports:
+      - '${WEB_EXPOSURE_PORT}:${WEB_PORT}'
+    volumes:
+      - ./fotrris:/var/www/html
+    depends_on:
+      - server
+    links:
+      - "server:localhost"
